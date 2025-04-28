@@ -2,7 +2,7 @@ const net = require('net');
 const express = require('express');
 const app = express();
 const deviceManager = require('./deviceManager');
-const HTTP_PORT = process.env.PORT || 4000;
+const HTTP_PORT = process.env.PORT || 8888;
 
 // Commands for HF2211 scales
 const COMMANDS = {
