@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  iot-app:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile
+    container_name: iot-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./app:/usr/src/app
+    expose:
+      - 4000
+    networks:
+      - web
+
+  swag:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - URL=iotpilot.local
+      - VALIDATION=dns
+      - SUBDOMAINS=
+      - EMAIL=your-email@example.com
+    volumes:
+      - ./swag/config:/config
+    # No ports exposed to host - we'll access through Tailscale
+    expose:
+      - 80
+      - 443
+    depends_on:
+      - iot-app
+    restart: unless-stopped
+    networks:
+      - web
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_AUTH_KEY}
+      - TS_HOSTNAME=iotpilot
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_EXTRA_ARGS=--advertise-routes=172.18.0.0/16
+    volumes:
+      - ./tailscale-data:/var/lib/tailscale
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_MODULE
+    # Enable access to host network
+    network_mode: "host"
+
+networks:
+  web:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16

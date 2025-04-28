@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scale Control</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 5px; padding: 10px; }
+        input { margin: 5px; padding: 8px; width: 100px; }
+        #response { border: 1px solid #ccc; padding: 10px; margin-top: 10px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+<h1>Scale Control</h1>
+<button onclick="sendCommand('/weight')">Get Weight</button>
+<button onclick="sendCommand('/tare')">Tare Scale</button>
+<button onclick="sendCommand('/status')">Get Status</button>
+<button onclick="sendCommand('/clearPreset')">Clear Preset Tare</button>
+<div>
+    <input id="presetTareValue" type="number" step="0.01" min="0" max="30" placeholder="Tare (kg)">
+    <button onclick="sendPresetTare()">Set Preset Tare</button>
+</div>
+<div id="response">Response will appear here...</div>
+
+<script>
+    async function sendCommand(endpoint) {
+        try {
+            const response = await fetch(endpoint);
+            const data = await response.json();
+            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+            document.getElementById('response').textContent = `Error: ${error.message}`;
+        }
+    }
+
+    async function sendPresetTare() {
+        const value = document.getElementById('presetTareValue').value;
+        if (!value) {
+            document.getElementById('response').textContent = 'Error: Enter a tare value';
+            return;
+        }
+        try {
+            const response = await fetch(`/presetTare?value=${value}`);
+            const data = await response.json();
+            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+            document.getElementById('response').textContent = `Error: ${error.message}`;
+        }
+    }
+</script>
+</body>
+</html>
