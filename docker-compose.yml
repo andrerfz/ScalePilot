@@ -1,10 +1,9 @@
-
 services:
-  iot-app:
+  iotpilot:
     build:
       context: .
       dockerfile: Docker/Dockerfile
-    container_name: iot-app
+    container_name: iotpilot
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -27,18 +26,18 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Madrid
-      - URL=iotpilot.local
-      - VALIDATION=dns
+      - URL=${DOMAIN}  # Use the domain from .env
+      - VALIDATION=http  # Changed from dns to http for easier setup
       - SUBDOMAINS=
-      - EMAIL=your-email@example.com
+      - EMAIL=${EMAIL}  # Use the email from .env
     volumes:
+      - ./Docker/Swag/nginx-site-confs-default.conf:/config/nginx/site-confs/default.conf
       - ./swag/config:/config
-    # No ports exposed to host - we'll access through Tailscale
-    expose:
-      - 80
-      - 443
+    ports:  # Expose ports to host
+      - 80:80
+      - 443:443
     depends_on:
-      - iot-app
+      - iotpilot
     restart: unless-stopped
     networks:
       - web

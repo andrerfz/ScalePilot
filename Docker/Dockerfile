@@ -4,15 +4,15 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Copy package files
-COPY package.json ./
+COPY app/package*.json ./
 
 # Install dependencies
 RUN npm install --production
 
-# Copy application code - copy directly to working directory
-COPY app/* ./
+# Copy all application code including subdirectories
+COPY app/ ./
 
-# Set the correct entry point - no subdirectory
+# Expose port
 EXPOSE 4000
 
 CMD ["node", "index.js"]

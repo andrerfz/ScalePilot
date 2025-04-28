@@ -19,9 +19,7 @@ fi
 if [ ! -f tailscale.env ]; then
   echo "ERROR: tailscale.env file is missing. Please create it from tailscale.env.example"
   echo "Example content:"
-  echo "NOIP_USERNAME=your_noip_username"
-  echo "NOIP_PASSWORD=your_noip_password"
-  echo "NOIP_HOSTNAMES=yourdomain.ddns.net"
+  echo "TAILSCALE_AUTH_KEY=tskey-auth-xxxxxxxxxxxx"
   MISSING_FILES=1
 fi
 
@@ -38,16 +36,31 @@ if [ $MISSING_FILES -eq 1 ]; then
   exit 1
 fi
 
-# Deploy Docker containers - specifying the dockerfile path
+# Create SWAG configuration directory if it doesn't exist
+if [ ! -d swag/config/nginx/site-confs ]; then
+  echo "Creating SWAG configuration directory structure..."
+  mkdir -p swag/config/nginx/site-confs
+fi
+
+# Deploy Docker containers
 echo "All required files found. Deploying Docker containers..."
-docker-compose -f docker-compose.yml up -d --build
+docker-compose down
+docker-compose up -d --build
 
 # Check if deployment was successful
 if [ $? -eq 0 ]; then
   echo
   echo "Deployment completed successfully!"
   echo
-  echo "Your IoT Pilot should now be accessible at: https://$(grep DOMAIN .env | cut -d= -f2)"
+  echo "Your IoT Pilot should now be accessible at:"
+  echo "  - Local: http://localhost (port 80)"
+  domain=$(grep DOMAIN .env | cut -d= -f2)
+  if [ ! -z "$domain" ]; then
+    echo "  - Internet (when DNS propagates): http://$domain"
+  fi
+  echo
+  echo "Check Tailscale Authentication:"
+  echo "  docker logs tailscale | grep 'To authenticate'"
   echo
   echo "Useful commands:"
   echo "  docker-compose logs -f     # View logs"
