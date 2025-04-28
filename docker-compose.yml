@@ -33,9 +33,9 @@ services:
     volumes:
       - ./Docker/Swag/nginx-site-confs-default.conf:/config/nginx/site-confs/default.conf
       - ./swag/config:/config
-    ports:  # Expose ports to host
-      - 80:80
-      - 443:443
+    ports:
+      - 8080:80     # Map host port 8080 to container port 80
+      - 8443:443    # Map host port 8443 to container port 443
     depends_on:
       - iotpilot
     restart: unless-stopped
