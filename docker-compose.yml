@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   iot-app:
@@ -9,8 +8,11 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+    # Using named volume for node_modules to avoid it being overwritten
     volumes:
-      - ./app:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+      - ./app/public:/usr/src/app/public
+      - ./app/config:/usr/src/app/config
     expose:
       - 4000
     networks:
@@ -66,3 +68,6 @@ networks:
     ipam:
       config:
         - subnet: 172.18.0.0/16
+
+volumes:
+  node_modules:

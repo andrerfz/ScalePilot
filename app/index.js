@@ -1,5 +1,11 @@
-// This is the entry point for the IoT Pilot application
-// It simply forwards the execution to the app/index.js file
+console.log('Current directory:', __dirname);
+const fs = require('fs');
+console.log('Files in directory:', fs.readdirSync(__dirname));
 
-// Require the app's main entry point
-require('./app');
+try {
+    const server = require('./server');
+    console.log('Server loaded successfully');
+} catch (error) {
+    console.error('Error loading server:', error);
+    process.exit(1);
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "id": "scale1",
+    "name": "HF2211 Scale",
+    "type": "scale",
+    "model": "HF2211",
+    "host": "192.168.1.11",
+    "port": 9999,
+    "isDefault": true
+  }
+]
