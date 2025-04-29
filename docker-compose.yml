@@ -20,22 +20,19 @@ services:
   swag:
     image: lscr.io/linuxserver/swag:latest
     container_name: swag
-    cap_add:
-      - NET_ADMIN
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Madrid
-      - URL=${DOMAIN}  # Use the domain from .env
-      - VALIDATION=http  # Changed from dns to http for easier setup
+      - URL=iotpilot  # Simple name, not a domain
+      - VALIDATION=none  # This tells SWAG to use self-signed certs
       - SUBDOMAINS=
-      - EMAIL=${EMAIL}  # Use the email from .env
+      - EMAIL=your-email@example.com
     volumes:
-      - ./Docker/Swag/nginx-site-confs-default.conf:/config/nginx/site-confs/default.conf
       - ./swag/config:/config
     ports:
-      - 8080:80     # Map host port 8080 to container port 80
-      - 8443:443    # Map host port 8443 to container port 443
+      - "80:80"
+      - "443:443"
     depends_on:
       - iotpilot
     restart: unless-stopped
